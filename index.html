@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Mobile Fix)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Stable Popup Load)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -11,37 +11,12 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
         
-        /* Ρυθμίσεις για το minimal popup (Desktop & Tablet) */
+        /* Ρυθμίσεις για το minimal popup */
         .minimal-popup .leaflet-popup-tip {
             display: none; 
         }
         .minimal-popup .leaflet-popup-content-wrapper {
-             padding: 10px; 
-        }
-        
-        /* ********** MOBILE RESPONSIVE CSS (Fixed MaxWidth) ********** */
-        @media (max-width: 450px) {
-            
-            /* ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Πρέπει να αντικαταστήσουμε το maxWidth: 300px του Leaflet! */
-            .leaflet-popup-content-wrapper {
-                 max-width: 90vw !important; /* Το Popup δεν ξεπερνά το 90% του πλάτους οθόνης */
-            }
-            
-            /* Αυτόματα προσαρμόζουμε το περιεχόμενο (εικόνα) */
-            .minimal-popup .leaflet-popup-content {
-                width: 100% !important; 
-            }
-            
-            /* Μικραίνουμε την εικόνα (75% του 90% του πλάτους οθόνης) */
-            #popup-img {
-                max-width: 75% !important; 
-                margin: 0 auto; 
-            }
-            
-            /* Μειώνουμε το padding για μικρές οθόνες */
-            .minimal-popup .leaflet-popup-content-wrapper {
-                 padding: 5px; 
-            }
+             padding: 10px; /* Κρατάμε το 10px περιθώριο */
         }
 
     </style>
@@ -54,26 +29,27 @@
  
 <script>
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
-    const lat = 37.265802;       
-    const lng = 23.158134;       
-    const radiusMeters = 80;     
-    const finalZoom = 17;        
-    const initialZoom = 6;       
+    const lat = 37.265186;       // ΠΛΑΤΟΣ (Προορισμός)
+    const lng = 23.158467;       // ΜΗΚΟΣ (Προορισμός)
+    const radiusMeters = 80;     // Ακτίνα 80 μέτρα
+    const finalZoom = 17;        // Τελικό επίπεδο ζουμ
+    const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
     
     // !!! ΣΥΝΔΕΣΜΟΣ ΦΩΤΟΓΡΑΦΙΑΣ ΑΠΟ GITHUB !!!
     const imageURL = 'https://raw.githubusercontent.com/hub-coaching/leaflet-map-mask-2-color/main/images/Map-Photo.png'; 
     // **********************************************************
     
+    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6) σε κεντρικό σημείο Ελλάδας
     const mymap = L.map('mapid').setView([39.0, 23.0], initialZoom);
 
-    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ --- */
+    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
     L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
 
-    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
+    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT (ΜΟΝΟ ΕΙΚΟΝΑ) ****************
     const popupContent = `
         <div style="text-align: center;">
             <img id="popup-img" src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 250px; height: auto; display: block;">
@@ -82,11 +58,10 @@
 
     // **************** 2. ΡΥΘΜΙΣΕΙΣ POPUP ****************
     const popupOptions = {
-        // Κρατάμε το 300px για desktop/tablet
         maxWidth: 300, 
         className: 'minimal-popup'
     };
-    
+
     /* --- 3. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ --- */
     const propertyMarker = L.marker([lat, lng]);
     propertyMarker.bindPopup(popupContent, popupOptions);
@@ -104,22 +79,30 @@
     // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
     mymap.whenReady(function() {
         
+        // Εκτελούμε το Fly-to animation
         mymap.flyTo([lat, lng], finalZoom, {
             duration: 4, 
             easeLinearity: 0.5 
         });
 
+        // Όταν τελειώσει η κίνηση του χάρτη ('moveend')
         mymap.once('moveend', function() {
+            // Εμφανίζουμε Marker και Circle
             propertyMarker.addTo(mymap);
             highlightCircle.addTo(mymap);
             
-            // ΛΟΓΙΚΗ: Ανοίγουμε το Popup αφού φορτωθεί η εικόνα (για σταθερότητα)
+            // ΝΕΑ ΛΟΓΙΚΗ: Ανοίγουμε το Popup αφού φορτωθεί η εικόνα
+            
+            // 1. Δημιουργούμε ένα προσωρινό αντικείμενο εικόνας
             const img = new Image();
             img.onload = function() {
+                // 2. Μόλις φορτωθεί η εικόνα, ανοίγουμε το Popup
                 propertyMarker.openPopup();
             };
+            // 3. Ξεκινάμε τη φόρτωση της εικόνας
             img.src = imageURL;
             
+            // (Εάν η εικόνα είναι ήδη στην cache, το ανοίγουμε αμέσως)
             if (img.complete) {
                 propertyMarker.openPopup();
             }
