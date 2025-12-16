@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Highlight Map with Popup</title>
+    <title>Leaflet Fly-to Animation with Marker</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     
     <style>
-        /* Κάνουμε τον χάρτη να καταλαμβάνει όλο το ύψος/πλάτος */
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
     </style>
@@ -21,35 +20,30 @@
  
 <script>
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
-    const lat = 37.265802;       // ΠΛΑΤΟΣ
-    const lng = 23.158134;       // ΜΗΚΟΣ
-    const radiusMeters = 100;    // Ακτίνα σε μέτρα
-    const circleColor = '#eab308'; // Το χρώμα της επιλογής σας (κίτρινο)
+    const lat = 37.265802;       // ΠΛΑΤΟΣ (Προορισμός)
+    const lng = 23.158134;       // ΜΗΚΟΣ (Προορισμός)
+    const finalZoom = 17;        // Τελικό επίπεδο ζουμ (πολύ κοντά)
+    const initialZoom = 6;       // Αρχικό επίπεδο ζουμ (Δείχνει όλη την Ελλάδα)
     
-    // === !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!! ===
+    // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
     const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
-    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
+    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ 
     // **********************************************************
     
-    // Αρχικοποίηση χάρτη
-    const mymap = L.map('mapid').setView([lat, lng], 11);
+    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6) για να δείξει την Ελλάδα
+    const mymap = L.map('mapid').setView([lat, lng], initialZoom);
 
-    /* --- 1. ΤΟ ΑΣΠΡΟΜΑΥΡΟ ΦΟΝΤΟ (STAMEN TONER) --- */
+    /* --- ΤΟ ΑΣΠΡΟΜΑΥΡΟ ΦΟΝΤΟ (STAMEN TONER) --- */
     L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>...'
     }).addTo(mymap);
 
 
-    /* --- 2. Ο ΚΥΚΛΟΣ ΠΟΥ ΕΙΝΑΙ ΚΙΤΡΙΝΟΣ ΚΑΙ ΔΙΑΦΑΝΗΣ --- */
-    const highlightCircle = L.circle([lat, lng], {
-        color: circleColor,      // Περίγραμμα
-        fillColor: circleColor,  // Εσωτερικό
-        fillOpacity: 0.5,        // Διαφάνεια 50%
-        radius: radiusMeters
-    }).addTo(mymap);
+    /* --- 1. ΔΗΜΙΟΥΡΓΙΑ MARKER (ΔΕΙΚΤΗ) --- */
+    const propertyMarker = L.marker([lat, lng]).addTo(mymap);
 
-    // **************** ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
+    // **************** 2. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
     const popupContent = `
         <div style="text-align: center; font-family: sans-serif;">
             <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Για περισσότερες πληροφορίες:</p>
@@ -62,11 +56,24 @@
         </div>
     `;
 
-    // Σύνδεση του popup με τον κύκλο (θα εμφανιστεί με κλικ)
-    highlightCircle.bindPopup(popupContent);
+    // Σύνδεση του popup με τον δείκτη
+    propertyMarker.bindPopup(popupContent);
 
-    // Προσαρμογή του zoom για να δείχνει όλο τον κύκλο
-    mymap.fitBounds(highlightCircle.getBounds());
+    // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ****************
+    // Αυτό εκτελείται μόλις φορτώσει ο χάρτης:
+    setTimeout(() => {
+        // Η μέθοδος flyTo() κάνει ομαλή μετάβαση και ζουμ
+        mymap.flyTo([lat, lng], finalZoom, {
+            duration: 4, // Διάρκεια animation σε δευτερόλεπτα (π.χ. 4 δευτερόλεπτα)
+            easeLinearity: 0.5 // Ομαλή κίνηση
+        });
+
+        // Ανοίγουμε το popup μόλις τελειώσει το animation (ή λίγο μετά)
+        setTimeout(() => {
+            propertyMarker.openPopup();
+        }, 4000); // 4000ms (4 δευτερόλεπτα)
+        
+    }, 500); // Μικρή καθυστέρηση για να φορτώσει ο χάρτης
 </script>
 
 </body>
