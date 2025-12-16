@@ -64,8 +64,10 @@
 */
     /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ (ΑΡΧΙΚΑ ΧΩΡΙΣ addTo) --- */
     // Δεν τα προσθέτουμε στον χάρτη ακόμα για να μην εμφανιστούν κατά το animation
-    const propertyMarker = L.marker([lat, lng]);
-    propertyMarker.bindPopup(popupContent);
+    propertyMarker.bindPopup(popupContent, {
+    maxWidth: 280, // Ορίζουμε το πλάτος του πλαισίου του Popup
+    className: 'minimal-popup'
+});
 
     const highlightCircle = L.circle([lat, lng], {
         radius: radiusMeters,
@@ -74,7 +76,10 @@
         fillOpacity: 0.35,
         weight: 2
     });
-    highlightCircle.bindPopup(popupContent);
+   highlightCircle.bindPopup(popupContent, {
+    maxWidth: 280,
+    className: 'minimal-popup'
+});
 
 
     // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
