@@ -26,17 +26,17 @@
     const initialZoom = 6;       // Αρχικό επίπεδο ζουμ (Δείχνει όλη την Ελλάδα)
     
     // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
-    const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
-    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ 
+   const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
+    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
     // **********************************************************
     
-    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6) για να δείξει την Ελλάδα
+    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
     const mymap = L.map('mapid').setView([lat, lng], initialZoom);
 
-    /* --- ΤΟ ΑΣΠΡΟΜΑΥΡΟ ΦΟΝΤΟ (STAMEN TONER) --- */
-    L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
-        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>...'
+        attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
 
@@ -47,9 +47,7 @@
     const popupContent = `
         <div style="text-align: center; font-family: sans-serif;">
             <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Για περισσότερες πληροφορίες:</p>
-            
             <img src="${imageURL}" alt="Φωτογραφία Ακινήτου" style="max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; border: 1px solid #ccc;">
-            
             <a href="${websiteLink}" target="_blank" style="display: inline-block; padding: 8px 15px; background-color: #eab308; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
                 Πάτησε Εδώ
             </a>
@@ -60,20 +58,19 @@
     propertyMarker.bindPopup(popupContent);
 
     // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ****************
-    // Αυτό εκτελείται μόλις φορτώσει ο χάρτης:
     setTimeout(() => {
         // Η μέθοδος flyTo() κάνει ομαλή μετάβαση και ζουμ
         mymap.flyTo([lat, lng], finalZoom, {
-            duration: 4, // Διάρκεια animation σε δευτερόλεπτα (π.χ. 4 δευτερόλεπτα)
-            easeLinearity: 0.5 // Ομαλή κίνηση
+            duration: 4, // Διάρκεια animation
+            easeLinearity: 0.5 
         });
 
-        // Ανοίγουμε το popup μόλις τελειώσει το animation (ή λίγο μετά)
+        // Ανοίγουμε το popup μόλις τελειώσει το animation
         setTimeout(() => {
             propertyMarker.openPopup();
-        }, 4000); // 4000ms (4 δευτερόλεπτα)
+        }, 4000); 
         
-    }, 500); // Μικρή καθυστέρηση για να φορτώσει ο χάρτης
+    }, 500); 
 </script>
 
 </body>
