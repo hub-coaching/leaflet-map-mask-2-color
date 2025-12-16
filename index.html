@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Mask Highlight Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    
+    <style>
+        /* Κάνουμε τον χάρτη να καταλαμβάνει όλο το ύψος/πλάτος */
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
+        #mapid { height: 100%; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="mapid"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet.mask/dist/L.Mask.js"></script> 
+ 
+<script>
+    // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
+    // ΑΛΛΑΞΤΕ ΑΥΤΕΣ ΤΙΣ ΤΙΜΕΣ
+    const lat = 37.9838;       // ΠΛΑΤΟΣ
+    const lng = 23.7275;       // ΜΗΚΟΣ
+    const radiusMeters = 100;  // Ακτίνα σε μέτρα
+    const circleColor = '#eab308'; // Το χρώμα της επιλογής σας
+    // **********************************************************
+    
+    // Αρχικοποίηση χάρτη
+    const mymap = L.map('mapid').setView([lat, lng], 15);
+
+    /* --- 1. ΤΟ ΓΚΡΙ ΦΟΝΤΟ (BASE LAYER) --- */
+    // CartoDB Positron (φωτεινό γκρι, μη χρωματιστό)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(mymap);
+
+
+    /* --- 2. Ο ΧΡΩΜΑΤΙΣΤΟΣ ΧΑΡΤΗΣ (OVERLAY INSIDE MASK) --- */
+    // Κλασικός OpenStreetMap (χρωματιστός)
+    const colorTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OSM</a>'
+    });
+
+    // Δημιουργία του σχήματος (κύκλου)
+    const highlightCircle = L.circle([lat, lng], {
+        radius: radiusMeters,
+        color: circleColor,
+        fillColor: circleColor,
+        fillOpacity: 0.2 // Μικρή διαφάνεια για να φαίνονται τα κτίρια
+    });
+
+    // Χρήση του plugin L.mask: Εμφανίζει τον 'colorTiles' (χρωματιστό χάρτη) μόνο μέσα στον κύκλο.
+    // Χρησιμοποιούμε το GeoJSON του κύκλου ως μάσκα.
+    L.mask(colorTiles, highlightCircle.toGeoJSON()).addTo(mymap);
+
+    // Προσθήκη του περιγράμματος του κύκλου (για να ξεχωρίζει)
+    highlightCircle.addTo(mymap);
+
+    // Προσαρμογή του zoom για να δείχνει όλο τον κύκλο
+    mymap.fitBounds(highlightCircle.getBounds());
+</script>
+
+</body>
+</html>
