@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Stable Popup Load)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Responsive Percentage)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -11,12 +11,33 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
         
-        /* Ρυθμίσεις για το minimal popup */
+        /* Ρυθμίσεις για το minimal popup (Desktop & Tablet) */
         .minimal-popup .leaflet-popup-tip {
             display: none; 
         }
         .minimal-popup .leaflet-popup-content-wrapper {
-             padding: 10px; /* Κρατάμε το 10px περιθώριο */
+             padding: 10px; 
+        }
+        
+        /* ********** MOBILE RESPONSIVE CSS (Percentage Based) ********** */
+        /* Όταν η οθόνη είναι 450px ή μικρότερη (Κινητά) */
+        @media (max-width: 450px) {
+            
+            /* Αρχικά, περιορίζουμε το πλαίσιο του Popup να μην ξεπερνά το 95% της οθόνης */
+            .leaflet-popup-pane .leaflet-popup-content-wrapper {
+                 max-width: 95vw; /* 95% του Viewport Width */
+            }
+
+            /* Αυτόματα προσαρμόζουμε το περιεχόμενο (εικόνα) */
+            .minimal-popup .leaflet-popup-content {
+                width: 100% !important; /* Καταλαμβάνει όλο το διαθέσιμο πλάτος */
+            }
+            
+            /* Μικραίνουμε την εικόνα με ποσοστό % */
+            #popup-img {
+                max-width: 90% !important; /* Η εικόνα καταλαμβάνει το 90% του περιεχομένου */
+                margin: 0 auto; /* Κεντράρισμα της εικόνας */
+            }
         }
 
     </style>
@@ -29,7 +50,7 @@
  
 <script>
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
-    const lat = 37.265186;       // ΠΛΑΤΟΣ (Προορισμός)
+        const lat = 37.265186;       // ΠΛΑΤΟΣ (Προορισμός)
     const lng = 23.158467;       // ΜΗΚΟΣ (Προορισμός)
     const radiusMeters = 80;     // Ακτίνα 80 μέτρα
     const finalZoom = 17;        // Τελικό επίπεδο ζουμ
@@ -39,17 +60,16 @@
     const imageURL = 'https://raw.githubusercontent.com/hub-coaching/leaflet-map-mask-2-color/main/images/Map-Photo.png'; 
     // **********************************************************
     
-    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6) σε κεντρικό σημείο Ελλάδας
     const mymap = L.map('mapid').setView([39.0, 23.0], initialZoom);
 
-    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
+    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ --- */
     L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
 
-    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT (ΜΟΝΟ ΕΙΚΟΝΑ) ****************
+    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
     const popupContent = `
         <div style="text-align: center;">
             <img id="popup-img" src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 250px; height: auto; display: block;">
@@ -61,7 +81,7 @@
         maxWidth: 300, 
         className: 'minimal-popup'
     };
-
+    
     /* --- 3. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ --- */
     const propertyMarker = L.marker([lat, lng]);
     propertyMarker.bindPopup(popupContent, popupOptions);
@@ -79,30 +99,22 @@
     // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
     mymap.whenReady(function() {
         
-        // Εκτελούμε το Fly-to animation
         mymap.flyTo([lat, lng], finalZoom, {
             duration: 4, 
             easeLinearity: 0.5 
         });
 
-        // Όταν τελειώσει η κίνηση του χάρτη ('moveend')
         mymap.once('moveend', function() {
-            // Εμφανίζουμε Marker και Circle
             propertyMarker.addTo(mymap);
             highlightCircle.addTo(mymap);
             
-            // ΝΕΑ ΛΟΓΙΚΗ: Ανοίγουμε το Popup αφού φορτωθεί η εικόνα
-            
-            // 1. Δημιουργούμε ένα προσωρινό αντικείμενο εικόνας
+            // ΛΟΓΙΚΗ: Ανοίγουμε το Popup αφού φορτωθεί η εικόνα (για σταθερότητα)
             const img = new Image();
             img.onload = function() {
-                // 2. Μόλις φορτωθεί η εικόνα, ανοίγουμε το Popup
                 propertyMarker.openPopup();
             };
-            // 3. Ξεκινάμε τη φόρτωση της εικόνας
             img.src = imageURL;
             
-            // (Εάν η εικόνα είναι ήδη στην cache, το ανοίγουμε αμέσως)
             if (img.complete) {
                 propertyMarker.openPopup();
             }
