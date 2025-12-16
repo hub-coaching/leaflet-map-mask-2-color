@@ -22,19 +22,19 @@
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
     const lat = 37.265802;       // ΠΛΑΤΟΣ (Προορισμός)
     const lng = 23.158134;       // ΜΗΚΟΣ (Προορισμός)
-    const finalZoom = 17;        // Τελικό επίπεδο ζουμ (πολύ κοντά)
-    const initialZoom = 6;       // Αρχικό επίπεδο ζουμ (Δείχνει όλη την Ελλάδα)
+    const finalZoom = 17;        // Τελικό επίπεδο ζουμ
+    const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
     
     // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
-   const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
+    const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
     const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
     // **********************************************************
     
     // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
     const mymap = L.map('mapid').setView([lat, lng], initialZoom);
 
-    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΝΕΑ ΔΙΑΔΡΟΜΗ) --- */
+    L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
