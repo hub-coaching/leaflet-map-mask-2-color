@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Stable Popup Load)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Mobile Responsive 80%)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -11,13 +11,34 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
         
-        /* Ρυθμίσεις για το minimal popup */
+        /* Ρυθμίσεις για το minimal popup (Desktop & Tablet) */
         .minimal-popup .leaflet-popup-tip {
             display: none; 
         }
         .minimal-popup .leaflet-popup-content-wrapper {
              padding: 10px; /* Κρατάμε το 10px περιθώριο */
         }
+        
+        /* ********** ΠΡΟΣΘΗΚΗ: MOBILE RESPONSIVE CSS (80% Image) ********** */
+        @media (max-width: 450px) {
+            
+            /* ΚΡΙΣΙΜΟ: Περιορίζουμε το μέγιστο πλάτος του Popup στο 90% της οθόνης */
+            .leaflet-popup-content-wrapper {
+                 max-width: 90vw !important; 
+            }
+            
+            /* Η εικόνα πρέπει να συρρικνωθεί */
+            #popup-img {
+                max-width: 80% !important; /* Η εικόνα καταλαμβάνει το 80% του πλαισίου */
+                margin: 0 auto; /* Κεντράρισμα της εικόνας */
+            }
+            
+            /* Μειώνουμε λίγο το περιθώριο για μικρές οθόνες */
+            .minimal-popup .leaflet-popup-content-wrapper {
+                 padding: 5px; 
+            }
+        }
+        /* *************************************************************** */
 
     </style>
 </head>
@@ -92,14 +113,10 @@
             highlightCircle.addTo(mymap);
             
             // ΝΕΑ ΛΟΓΙΚΗ: Ανοίγουμε το Popup αφού φορτωθεί η εικόνα
-            
-            // 1. Δημιουργούμε ένα προσωρινό αντικείμενο εικόνας
             const img = new Image();
             img.onload = function() {
-                // 2. Μόλις φορτωθεί η εικόνα, ανοίγουμε το Popup
                 propertyMarker.openPopup();
             };
-            // 3. Ξεκινάμε τη φόρτωση της εικόνας
             img.src = imageURL;
             
             // (Εάν η εικόνα είναι ήδη στην cache, το ανοίγουμε αμέσως)
