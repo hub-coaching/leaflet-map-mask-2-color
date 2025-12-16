@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Mask Highlight Map</title>
+    <title>Leaflet Highlight Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -18,12 +18,9 @@
 <div id="mapid"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-mask/0.1.0/L.Mask.min.js"></script> 
  
 <script>
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
-    // ΝΕΕΣ ΣΥΝΤΕΤΑΓΜΕΝΕΣ
     const lat = 37.265802;       // ΠΛΑΤΟΣ
     const lng = 23.158134;       // ΜΗΚΟΣ
     const radiusMeters = 100;    // Ακτίνα σε μέτρα
@@ -33,34 +30,21 @@
     // Αρχικοποίηση χάρτη
     const mymap = L.map('mapid').setView([lat, lng], 15);
 
-    /* --- 1. ΤΟ ΓΚΡΙ ΦΟΝΤΟ (BASE LAYER) --- */
-    // CartoDB Positron (φωτεινό γκρι, μη χρωματιστό)
+    /* --- 1. ΤΟ ΓΚΡΙ ΦΟΝΤΟ (ΣΤΑΘΕΡΟ TILE LAYER) --- */
+    // CartoDB Positron (φωτεινό γκρι)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
 
-    /* --- 2. Ο ΧΡΩΜΑΤΙΣΤΟΣ ΧΑΡΤΗΣ (OVERLAY INSIDE MASK) --- */
-    // Κλασικός OpenStreetMap (χρωματιστός)
-    const colorTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OSM</a>'
-    });
-
-    // Δημιουργία του σχήματος (κύκλου)
+    /* --- 2. Ο ΚΥΚΛΟΣ ΠΟΥ ΕΙΝΑΙ ΚΙΤΡΙΝΟΣ ΚΑΙ ΔΙΑΦΑΝΗΣ --- */
     const highlightCircle = L.circle([lat, lng], {
-        radius: radiusMeters,
-        color: circleColor,
-        fillColor: circleColor,
-        fillOpacity: 0.2 
-    });
-
-    // Εφαρμογή της μάσκας: Εμφανίζει τον 'colorTiles' (χρωματιστό χάρτη) μόνο μέσα στον κύκλο.
-    L.mask(colorTiles, highlightCircle.toGeoJSON()).addTo(mymap);
-
-    // Προσθήκη του περιγράμματος του κύκλου (για να ξεχωρίζει)
-    highlightCircle.addTo(mymap);
+        color: circleColor,      // Περίγραμμα
+        fillColor: circleColor,  // Εσωτερικό
+        fillOpacity: 0.5,        // Διαφάνεια 50% για να φαίνεται το γκρι φόντο
+        radius: radiusMeters
+    }).addTo(mymap);
 
     // Προσαρμογή του zoom για να δείχνει όλο τον κύκλο
     mymap.fitBounds(highlightCircle.getBounds());
