@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Smooth)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -22,9 +22,10 @@
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
     const lat = 37.265802;       // ΠΛΑΤΟΣ (Προορισμός)
     const lng = 23.158134;       // ΜΗΚΟΣ (Προορισμός)
-    const radiusMeters = 80;     // Ακτίνα 80 μέτρα (ΝΕΑ ΡΥΘΜΙΣΗ)
-    const finalZoom = 17;        // Τελικό επίπεδο ζουμ (πολύ κοντά)
+    const radiusMeters = 80;     // Ακτίνα 80 μέτρα
+    const finalZoom = 17;        // Τελικό επίπεδο ζουμ
     const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
+    const flyDuration = 3.5;     // Διάρκεια animation (3.5 δευτερόλεπτα)
     
     // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
     const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
@@ -32,7 +33,9 @@
     // **********************************************************
     
     // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
-    const mymap = L.map('mapid').setView([lat, lng], initialZoom);
+    // ΣΗΜΕΙΩΣΗ: Αλλάζουμε το view σε ένα κεντρικό σημείο της Ελλάδας, όχι στον τελικό προορισμό, 
+    // για να ξεκινήσει σωστά το flyTo.
+    const mymap = L.map('mapid').setView([39.0, 23.0], initialZoom);
 
     /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
     L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
@@ -52,35 +55,39 @@
         </div>
     `;
 
-    /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER (ΔΕΙΚΤΗ) --- */
-    const propertyMarker = L.marker([lat, lng]).addTo(mymap);
+    /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ (ΑΡΧΙΚΑ ΧΩΡΙΣ addTo) --- */
+    // Δεν τα προσθέτουμε στον χάρτη ακόμα για να μην εμφανιστούν κατά το animation
+    const propertyMarker = L.marker([lat, lng]);
     propertyMarker.bindPopup(popupContent);
 
-    /* --- 3. ΔΗΜΙΟΥΡΓΙΑ ΚΥΚΛΟΥ (HIGHLIGHT) --- */
     const highlightCircle = L.circle([lat, lng], {
         radius: radiusMeters,
-        color: '#eab308',      // Περίγραμμα
-        fillColor: '#eab308',  // Εσωτερικό
-        fillOpacity: 0.35,     // Διαφάνεια
-        weight: 2              // Πάχος περιγράμματος
-    }).addTo(mymap);
-
-    // Συνδέουμε το popup και με τον κύκλο
+        color: '#eab308',
+        fillColor: '#eab308',
+        fillOpacity: 0.35,
+        weight: 2
+    });
     highlightCircle.bindPopup(popupContent);
 
 
-    // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ****************
+    // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
     setTimeout(() => {
-        // Η μέθοδος flyTo() κάνει ομαλή μετάβαση και ζουμ
+        // Ξεκινάμε το ομαλό ζουμ
         mymap.flyTo([lat, lng], finalZoom, {
-            duration: 4, 
+            duration: flyDuration, 
             easeLinearity: 0.5 
         });
 
-        // Ανοίγουμε το popup μόλις τελειώσει το animation
+        // Εμφανίζουμε Marker και Circle αφού τελειώσει το animation
         setTimeout(() => {
+            // Προσθέτουμε τον δείκτη και τον κύκλο στον χάρτη
+            propertyMarker.addTo(mymap);
+            highlightCircle.addTo(mymap);
+            
+            // Ανοίγουμε το popup
             propertyMarker.openPopup();
-        }, 4000); 
+            
+        }, flyDuration * 1000); // Χρησιμοποιούμε τη διάρκεια του animation σε χιλιοστά του δευτερολέπτου
         
     }, 500); 
 </script>
