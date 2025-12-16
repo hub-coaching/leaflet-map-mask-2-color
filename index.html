@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Responsive Percentage)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Mobile Fix)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -19,24 +19,28 @@
              padding: 10px; 
         }
         
-        /* ********** MOBILE RESPONSIVE CSS (Percentage Based) ********** */
-        /* Όταν η οθόνη είναι 450px ή μικρότερη (Κινητά) */
+        /* ********** MOBILE RESPONSIVE CSS (Fixed MaxWidth) ********** */
         @media (max-width: 450px) {
             
-            /* Αρχικά, περιορίζουμε το πλαίσιο του Popup να μην ξεπερνά το 95% της οθόνης */
-            .leaflet-popup-pane .leaflet-popup-content-wrapper {
-                 max-width: 95vw; /* 95% του Viewport Width */
-            }
-
-            /* Αυτόματα προσαρμόζουμε το περιεχόμενο (εικόνα) */
-            .minimal-popup .leaflet-popup-content {
-                width: 100% !important; /* Καταλαμβάνει όλο το διαθέσιμο πλάτος */
+            /* ΚΡΙΣΙΜΗ ΔΙΟΡΘΩΣΗ: Πρέπει να αντικαταστήσουμε το maxWidth: 300px του Leaflet! */
+            .leaflet-popup-content-wrapper {
+                 max-width: 90vw !important; /* Το Popup δεν ξεπερνά το 90% του πλάτους οθόνης */
             }
             
-            /* Μικραίνουμε την εικόνα με ποσοστό % ΓΙΑ ΚΙΝΗΤΑ*/
+            /* Αυτόματα προσαρμόζουμε το περιεχόμενο (εικόνα) */
+            .minimal-popup .leaflet-popup-content {
+                width: 100% !important; 
+            }
+            
+            /* Μικραίνουμε την εικόνα (75% του 90% του πλάτους οθόνης) */
             #popup-img {
-                max-width: 85% !important; /* Η εικόνα καταλαμβάνει το 90% του περιεχομένου */
-                margin: 0 auto; /* Κεντράρισμα της εικόνας */
+                max-width: 75% !important; 
+                margin: 0 auto; 
+            }
+            
+            /* Μειώνουμε το padding για μικρές οθόνες */
+            .minimal-popup .leaflet-popup-content-wrapper {
+                 padding: 5px; 
             }
         }
 
@@ -50,11 +54,11 @@
  
 <script>
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
-        const lat = 37.265186;       // ΠΛΑΤΟΣ (Προορισμός)
-    const lng = 23.158467;       // ΜΗΚΟΣ (Προορισμός)
-    const radiusMeters = 80;     // Ακτίνα 80 μέτρα
-    const finalZoom = 17;        // Τελικό επίπεδο ζουμ
-    const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
+    const lat = 37.265802;       
+    const lng = 23.158134;       
+    const radiusMeters = 80;     
+    const finalZoom = 17;        
+    const initialZoom = 6;       
     
     // !!! ΣΥΝΔΕΣΜΟΣ ΦΩΤΟΓΡΑΦΙΑΣ ΑΠΟ GITHUB !!!
     const imageURL = 'https://raw.githubusercontent.com/hub-coaching/leaflet-map-mask-2-color/main/images/Map-Photo.png'; 
@@ -78,6 +82,7 @@
 
     // **************** 2. ΡΥΘΜΙΣΕΙΣ POPUP ****************
     const popupOptions = {
+        // Κρατάμε το 300px για desktop/tablet
         maxWidth: 300, 
         className: 'minimal-popup'
     };
