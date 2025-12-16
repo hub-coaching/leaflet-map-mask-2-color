@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to Animation with Marker</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -22,7 +22,8 @@
     // **************** ΡΥΘΜΙΣΕΙΣ & ΣΥΝΤΕΤΑΓΜΕΝΕΣ ****************
     const lat = 37.265802;       // ΠΛΑΤΟΣ (Προορισμός)
     const lng = 23.158134;       // ΜΗΚΟΣ (Προορισμός)
-    const finalZoom = 17;        // Τελικό επίπεδο ζουμ
+    const radiusMeters = 80;     // Ακτίνα 80 μέτρα (ΝΕΑ ΡΥΘΜΙΣΗ)
+    const finalZoom = 17;        // Τελικό επίπεδο ζουμ (πολύ κοντά)
     const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
     
     // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
@@ -33,17 +34,14 @@
     // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
     const mymap = L.map('mapid').setView([lat, lng], initialZoom);
 
-    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΝΕΑ ΔΙΑΔΡΟΜΗ) --- */
+    /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
     L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
 
-    /* --- 1. ΔΗΜΙΟΥΡΓΙΑ MARKER (ΔΕΙΚΤΗ) --- */
-    const propertyMarker = L.marker([lat, lng]).addTo(mymap);
-
-    // **************** 2. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
+    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
     const popupContent = `
         <div style="text-align: center; font-family: sans-serif;">
             <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Για περισσότερες πληροφορίες:</p>
@@ -54,14 +52,28 @@
         </div>
     `;
 
-    // Σύνδεση του popup με τον δείκτη
+    /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER (ΔΕΙΚΤΗ) --- */
+    const propertyMarker = L.marker([lat, lng]).addTo(mymap);
     propertyMarker.bindPopup(popupContent);
 
-    // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ****************
+    /* --- 3. ΔΗΜΙΟΥΡΓΙΑ ΚΥΚΛΟΥ (HIGHLIGHT) --- */
+    const highlightCircle = L.circle([lat, lng], {
+        radius: radiusMeters,
+        color: '#eab308',      // Περίγραμμα
+        fillColor: '#eab308',  // Εσωτερικό
+        fillOpacity: 0.35,     // Διαφάνεια
+        weight: 2              // Πάχος περιγράμματος
+    }).addTo(mymap);
+
+    // Συνδέουμε το popup και με τον κύκλο
+    highlightCircle.bindPopup(popupContent);
+
+
+    // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ****************
     setTimeout(() => {
         // Η μέθοδος flyTo() κάνει ομαλή μετάβαση και ζουμ
         mymap.flyTo([lat, lng], finalZoom, {
-            duration: 4, // Διάρκεια animation
+            duration: 4, 
             easeLinearity: 0.5 
         });
 
