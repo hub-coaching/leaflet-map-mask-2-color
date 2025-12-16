@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Smooth)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Image Only Popup)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -10,6 +10,16 @@
     <style>
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
+        
+        /* Προαιρετικό: Για να αφαιρεθεί το "πόδι" του popup και να γίνει πιο "minimal" */
+        .minimal-popup .leaflet-popup-tip {
+            display: none; 
+        }
+        /* Προαιρετικό: Μικρή ρύθμιση για το περιθώριο */
+        .minimal-popup .leaflet-popup-content-wrapper {
+             padding: 5px; 
+        }
+
     </style>
 </head>
 <body>
@@ -27,14 +37,11 @@
     const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
     const flyDuration = 3.5;     // Διάρκεια animation (3.5 δευτερόλεπτα)
     
-    // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
-    const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
-   // const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
+    // !!! ΣΤΟΙΧΕΙΑ ΦΩΤΟΓΡΑΦΙΑΣ !!!
+    const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; 
     // **********************************************************
     
-    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
-    // ΣΗΜΕΙΩΣΗ: Αλλάζουμε το view σε ένα κεντρικό σημείο της Ελλάδας, όχι στον τελικό προορισμό, 
-    // για να ξεκινήσει σωστά το flyTo.
+    // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6) σε κεντρικό σημείο Ελλάδας
     const mymap = L.map('mapid').setView([39.0, 23.0], initialZoom);
 
     /* --- ΤΟ ΓΚΡΙ ΦΟΝΤΟ (CartoDB Positron - ΣΤΑΘΕΡΟ) --- */
@@ -43,31 +50,23 @@
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
+
     // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT (ΜΟΝΟ ΕΙΚΟΝΑ) ****************
     const popupContent = `
         <div style="text-align: center;">
             <img src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 250px; height: auto; display: block;">
         </div>
     `;
-    
-/*
-    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
-    const popupContent = `
-        <div style="text-align: center; font-family: sans-serif;">
-            <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Request Details:</p>
-            <img src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; border: 1px solid #ccc;">
-            <a href="${websiteLink}" target="_blank" style="display: inline-block; padding: 8px 15px; background-color: #eab308; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
-                Πάτησε Εδώ
-            </a>
-        </div>
-    `;
-*/
-    /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ (ΑΡΧΙΚΑ ΧΩΡΙΣ addTo) --- */
-    // Δεν τα προσθέτουμε στον χάρτη ακόμα για να μην εμφανιστούν κατά το animation
-    propertyMarker.bindPopup(popupContent, {
-    maxWidth: 280, // Ορίζουμε το πλάτος του πλαισίου του Popup
-    className: 'minimal-popup'
-});
+
+    // **************** 2. ΡΥΘΜΙΣΕΙΣ POPUP ****************
+    const popupOptions = {
+        maxWidth: 280, // Δίνει αρκετό χώρο για την εικόνα των 250px
+        className: 'minimal-popup' // Για προσαρμοσμένο CSS
+    };
+
+    /* --- 3. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ --- */
+    const propertyMarker = L.marker([lat, lng]);
+    propertyMarker.bindPopup(popupContent, popupOptions); // Χρησιμοποιούμε τις νέες επιλογές
 
     const highlightCircle = L.circle([lat, lng], {
         radius: radiusMeters,
@@ -76,13 +75,10 @@
         fillOpacity: 0.35,
         weight: 2
     });
-   highlightCircle.bindPopup(popupContent, {
-    maxWidth: 280,
-    className: 'minimal-popup'
-});
+    highlightCircle.bindPopup(popupContent, popupOptions); // Χρησιμοποιούμε τις νέες επιλογές
 
 
-    // **************** 3. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
+    // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
     setTimeout(() => {
         // Ξεκινάμε το ομαλό ζουμ
         mymap.flyTo([lat, lng], finalZoom, {
@@ -92,14 +88,13 @@
 
         // Εμφανίζουμε Marker και Circle αφού τελειώσει το animation
         setTimeout(() => {
-            // Προσθέτουμε τον δείκτη και τον κύκλο στον χάρτη
             propertyMarker.addTo(mymap);
             highlightCircle.addTo(mymap);
             
             // Ανοίγουμε το popup
             propertyMarker.openPopup();
             
-        }, flyDuration * 1000); // Χρησιμοποιούμε τη διάρκεια του animation σε χιλιοστά του δευτερολέπτου
+        }, flyDuration * 1000); 
         
     }, 500); 
 </script>
