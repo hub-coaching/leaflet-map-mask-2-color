@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Fly-to, Marker & Circle Highlight (Image Only Popup)</title>
+    <title>Leaflet Fly-to, Marker & Circle Highlight (Fixed Popup Margins)</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -11,13 +11,12 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
         #mapid { height: 100%; width: 100%; }
         
-        /* Προαιρετικό: Για να αφαιρεθεί το "πόδι" του popup και να γίνει πιο "minimal" */
+        /* Ρυθμίσεις για το minimal popup */
         .minimal-popup .leaflet-popup-tip {
             display: none; 
         }
-        /* Προαιρετικό: Μικρή ρύθμιση για το περιθώριο */
         .minimal-popup .leaflet-popup-content-wrapper {
-             padding: 5px; 
+             padding: 10px; /* Αυξάνουμε το εσωτερικό περιθώριο σε 10px */
         }
 
     </style>
@@ -35,10 +34,8 @@
     const radiusMeters = 80;     // Ακτίνα 80 μέτρα
     const finalZoom = 17;        // Τελικό επίπεδο ζουμ
     const initialZoom = 6;       // Αρχικό επίπεδο ζουμ
-    const flyDuration = 3.5;     // Διάρκεια animation (3.5 δευτερόλεπτα)
     
-    // !!! ΣΤΟΙΧΕΙΑ ΦΩΤΟΓΡΑΦΙΑΣ !!!
-    // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΤΟ URL ΕΔΩ ΜΕ ΤΟΝ ΝΕΟ ΣΥΝΔΕΣΜΟ ΤΟΥ GITHUB RAW
+    // !!! ΣΥΝΔΕΣΜΟΣ ΦΩΤΟΓΡΑΦΙΑΣ ΑΠΟ GITHUB !!!
     const imageURL = 'https://raw.githubusercontent.com/hub-coaching/leaflet-map-mask-2-color/main/images/Map-Photo.png'; 
     // **********************************************************
     
@@ -61,13 +58,13 @@
 
     // **************** 2. ΡΥΘΜΙΣΕΙΣ POPUP ****************
     const popupOptions = {
-        maxWidth: 280, // Δίνει αρκετό χώρο για την εικόνα των 250px
+        maxWidth: 300, // Αυξήθηκε για να χωρέσει η 250px εικόνα + 10px περιθώριο σε κάθε πλευρά
         className: 'minimal-popup' // Για προσαρμοσμένο CSS
     };
 
     /* --- 3. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ --- */
     const propertyMarker = L.marker([lat, lng]);
-    propertyMarker.bindPopup(popupContent, popupOptions); // Χρησιμοποιούμε τις νέες επιλογές
+    propertyMarker.bindPopup(popupContent, popupOptions);
 
     const highlightCircle = L.circle([lat, lng], {
         radius: radiusMeters,
@@ -76,28 +73,28 @@
         fillOpacity: 0.35,
         weight: 2
     });
-    highlightCircle.bindPopup(popupContent, popupOptions); // Χρησιμοποιούμε τις νέες επιλογές
+    highlightCircle.bindPopup(popupContent, popupOptions);
 
 
     // **************** 4. ΤΟ ΕΦΕ ΤΟΥ FLY-TO ΚΑΙ ΟΜΑΛΗ ΕΜΦΑΝΙΣΗ ****************
-    setTimeout(() => {
-        // Ξεκινάμε το ομαλό ζουμ
+    mymap.whenReady(function() {
+        
+        // Εκτελούμε το Fly-to animation
         mymap.flyTo([lat, lng], finalZoom, {
-            duration: flyDuration, 
+            duration: 4, 
             easeLinearity: 0.5 
         });
 
-        // Εμφανίζουμε Marker και Circle αφού τελειώσει το animation
-        setTimeout(() => {
+        // Όταν τελειώσει η κίνηση του χάρτη ('moveend')
+        mymap.once('moveend', function() {
+            // Εμφανίζουμε Marker και Circle
             propertyMarker.addTo(mymap);
             highlightCircle.addTo(mymap);
             
             // Ανοίγουμε το popup
             propertyMarker.openPopup();
-            
-        }, flyDuration * 1000); 
-        
-    }, 500); 
+        });
+    });
 </script>
 
 </body>
