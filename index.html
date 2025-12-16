@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Highlight Map</title>
+    <title>Leaflet Highlight Map with Popup</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -25,16 +25,19 @@
     const lng = 23.158134;       // ΜΗΚΟΣ
     const radiusMeters = 100;    // Ακτίνα σε μέτρα
     const circleColor = '#eab308'; // Το χρώμα της επιλογής σας (κίτρινο)
+    
+    // === !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!! ===
+    const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
+    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
     // **********************************************************
     
     // Αρχικοποίηση χάρτη
     const mymap = L.map('mapid').setView([lat, lng], 15);
 
-    /* --- 1. ΤΟ ΓΚΡΙ ΦΟΝΤΟ (ΣΤΑΘΕΡΟ TILE LAYER) --- */
-    // CartoDB Positron (φωτεινό γκρι)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    /* --- 1. ΤΟ ΑΣΠΡΟΜΑΥΡΟ ΦΟΝΤΟ (STAMEN TONER) --- */
+    L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>...'
     }).addTo(mymap);
 
 
@@ -42,9 +45,25 @@
     const highlightCircle = L.circle([lat, lng], {
         color: circleColor,      // Περίγραμμα
         fillColor: circleColor,  // Εσωτερικό
-        fillOpacity: 0.5,        // Διαφάνεια 50% για να φαίνεται το γκρι φόντο
+        fillOpacity: 0.5,        // Διαφάνεια 50%
         radius: radiusMeters
     }).addTo(mymap);
+
+    // **************** ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
+    const popupContent = `
+        <div style="text-align: center; font-family: sans-serif;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Για περισσότερες πληροφορίες:</p>
+            
+            <img src="${imageURL}" alt="Φωτογραφία Ακινήτου" style="max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; border: 1px solid #ccc;">
+            
+            <a href="${websiteLink}" target="_blank" style="display: inline-block; padding: 8px 15px; background-color: #eab308; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                Πάτησε Εδώ
+            </a>
+        </div>
+    `;
+
+    // Σύνδεση του popup με τον κύκλο (θα εμφανιστεί με κλικ)
+    highlightCircle.bindPopup(popupContent);
 
     // Προσαρμογή του zoom για να δείχνει όλο τον κύκλο
     mymap.fitBounds(highlightCircle.getBounds());
