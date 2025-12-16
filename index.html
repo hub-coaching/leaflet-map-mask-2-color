@@ -29,7 +29,7 @@
     
     // !!! ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΑΘΟΥΝ !!!
     const imageURL = 'https://storage.mlcdn.com/account_image/703340/wRAS5WWYAwGMumTuYzs3pXmlFO9IoKYchiAqxBtY.png'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ ΤΟΥ ΑΚΙΝΗΤΟΥ
-    const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
+   // const websiteLink = 'https://spetses.hubsales.ch/'; // ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΜΕ ΤΟ URL ΤΗΣ ΙΣΤΟΣΕΛΙΔΑΣ ΣΑΣ
     // **********************************************************
     
     // Αρχικοποίηση χάρτη: Ξεκινάμε με χαμηλό zoom (6)
@@ -43,18 +43,25 @@
         attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(mymap);
 
-
+    // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT (ΜΟΝΟ ΕΙΚΟΝΑ) ****************
+    const popupContent = `
+        <div style="text-align: center;">
+            <img src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 250px; height: auto; display: block;">
+        </div>
+    `;
+    
+/*
     // **************** 1. ΔΗΜΙΟΥΡΓΙΑ POPUP CONTENT ****************
     const popupContent = `
         <div style="text-align: center; font-family: sans-serif;">
-            <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Για περισσότερες πληροφορίες:</p>
-            <img src="${imageURL}" alt="Φωτογραφία Ακινήτου" style="max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; border: 1px solid #ccc;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Request Details:</p>
+            <img src="${imageURL}" alt="Your Dream Home in Spetses" style="max-width: 100%; height: auto; display: block; margin: 0 auto 10px auto; border-radius: 4px; border: 1px solid #ccc;">
             <a href="${websiteLink}" target="_blank" style="display: inline-block; padding: 8px 15px; background-color: #eab308; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
                 Πάτησε Εδώ
             </a>
         </div>
     `;
-
+*/
     /* --- 2. ΔΗΜΙΟΥΡΓΙΑ MARKER ΚΑΙ ΚΥΚΛΟΥ (ΑΡΧΙΚΑ ΧΩΡΙΣ addTo) --- */
     // Δεν τα προσθέτουμε στον χάρτη ακόμα για να μην εμφανιστούν κατά το animation
     const propertyMarker = L.marker([lat, lng]);
